@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const User = require("./model");
 
 require("dotenv").config();
 
@@ -15,34 +14,34 @@ mongoose
 	.catch((err) => {
 		console.log("Error connecting to database", err);
 	});
+require("./model");
+const user = mongoose.model("User");
 
-app.post("/api/login", (req, res) => {
+app.post("/login", async (req, res) => {
 	const { username, password } = req.body;
 
-	const findUser = User.findOne({ username, password })
-		.then((user) => {
-			if (user) {
-				res.send("Login successful");
-			} else {
-				res.status(401).send("Invalid credentials");
-			}
-		})
-		.catch((err) => {
-			console.log("Error logging in", err);
-			res.status(500).send("Internal server error");
-		});
+	const userFound = await user.findOne({ username, password });
 
-	if (findUser.length === 0) {
-		User.create({ username, password })
-			.then(() => {
-				res.send("User created successfully");
-			})
-			.catch((err) => {
-				console.log("Error creating user", err);
-				res.status(500).send("Internal server error");
-			});
+	if (
+		!userFound &&
+		!userFound.username === "owner" &&
+		userFound.password === "owner"
+	) {
+		try {
+			await user.create({ username: username, password: password });
+			res.send({ status: "Ok", data: "Owner created" });
+		} catch (error) {
+			res.send({ status: "Error", error: error.message });
+		}
 	} else {
-		findUser;
+		res.send({ status: "Ok", data: "User logged in" });
+	}
+
+	try {
+		await user.create({ username: username, password: password });
+		res.send({ status: "Ok", data: "User created" });
+	} catch (error) {
+		res.send({ status: "Error", error: error.message });
 	}
 });
 
