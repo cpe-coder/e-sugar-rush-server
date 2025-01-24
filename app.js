@@ -14,34 +14,28 @@ mongoose
 	.catch((err) => {
 		console.log("Error connecting to database", err);
 	});
+
 require("./model");
 const user = mongoose.model("User");
+app.use(express.json());
 
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
 	const { username, password } = req.body;
 
-	const userFound = await user.findOne({ username, password });
+	const userExist = await user.findOne({
+		username: username,
+		password: password,
+	});
 
-	if (
-		!userFound &&
-		!userFound.username === "owner" &&
-		userFound.password === "owner"
-	) {
-		try {
-			await user.create({ username: username, password: password });
-			res.send({ status: "Ok", data: "Owner created" });
-		} catch (error) {
-			res.send({ status: "Error", error: error.message });
-		}
-	} else {
-		res.send({ status: "Ok", data: "User logged in" });
+	if (userExist) {
+		res.send({ status: "error", data: "User already exist" });
 	}
 
 	try {
 		await user.create({ username: username, password: password });
-		res.send({ status: "Ok", data: "User created" });
+		res.send({ status: "ok", data: "User created" });
 	} catch (error) {
-		res.send({ status: "Error", error: error.message });
+		res.send({ status: "error", data: error });
 	}
 });
 
