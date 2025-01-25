@@ -27,16 +27,22 @@ app.post("/api/login", async (req, res) => {
 		password: password,
 	});
 
-	if (userExist) {
-		res.send({ status: "error", data: "User already exist" });
+	if (
+		userExist &&
+		username === userExist.username &&
+		password === userExist.password
+	) {
+		res.send({ status: "ok", data: "Login successful" });
+	} else {
+		res.send({ status: "error", data: "Invalid username or password" });
 	}
 
-	try {
-		await user.create({ username: username, password: password });
-		res.send({ status: "ok", data: "User created" });
-	} catch (error) {
-		res.send({ status: "error", data: error });
-	}
+	// try {
+	// 	await user.create({ username: username, password: password });
+	// 	res.send({ status: "ok", data: "User created" });
+	// } catch (error) {
+	// 	res.send({ status: "error", data: error });
+	// }
 });
 
 app.listen(3000, () => {
