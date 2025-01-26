@@ -19,7 +19,7 @@ require("./model");
 const user = mongoose.model("User");
 app.use(express.json());
 
-app.post("/api/login", async (req, res) => {
+app.post("/auth/login", async (req, res) => {
 	const { username, password } = req.body;
 
 	const userExist = await user.findOne({
