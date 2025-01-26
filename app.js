@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const mongoUrl = process.env.MONGODB_URI;
+const PORT = 8000;
 
 mongoose
 	.connect(mongoUrl)
@@ -18,6 +19,10 @@ mongoose
 require("./model");
 const user = mongoose.model("User");
 app.use(express.json());
+
+app.get("/", (req, res) => {
+	res.send("Hello World");
+});
 
 app.post("/auth/login", async (req, res) => {
 	const { username, password } = req.body;
@@ -45,6 +50,6 @@ app.post("/auth/login", async (req, res) => {
 	// }
 });
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
 	console.log("Server is running on port 3000");
 });
