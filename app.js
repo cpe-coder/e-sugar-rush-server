@@ -10,7 +10,7 @@ const mongoUrl = process.env.MONGODB_URI;
 const PORT = 8000;
 
 const JWTSECRET =
-	"gjjk6vyl0twtosl6945gr0fz()709hgtq1fc98fmu725k[]{}4xvjkx7pecvtgr94fazvyt6yaj2ycxb2w6dazos0othe24cz9mp3oo7qrm8gf4js73x3dt064wzvjt6kz03b51pckkmiybh9wte4x0zvpkxbid00c58bci3re4al5j2pezpcej8o8btwe78hs6f4tubx264id";
+	"hvdvay6ert72839289()aiyg8t87qt72393293883uhefiuh78ttq3ifi78272jdsds039[]]pou89ywe";
 
 mongoose
 	.connect(mongoUrl)
@@ -38,7 +38,7 @@ app.post("/auth/login", async (req, res) => {
 
 	if (!userExist) {
 		return res.send({
-			data: "User doesn't exist! Please ask the developer",
+			data: "User doesn't exist! Please to the admin",
 		});
 	}
 
@@ -68,15 +68,14 @@ app.post("/auth/login", async (req, res) => {
 	// }
 });
 
-app.post("/auth/verification", async (req, res) => {
+app.post("/userdata", async (req, res) => {
 	const { token } = req.body;
-
 	try {
-		const user = jwt.verify(token, JWTSECRET);
-		const userUsername = user.username;
-
-		user.findOne({ username: userUsername }).then((data) => {
-			return res.send({ status: "ok", data: data });
+		const User = jwt.verify(token, JWTSECRET);
+		const userName = User.username;
+		user.findOne({ email: userName }).then((data) => {
+			console.log("verify");
+			return res.send({ status: "Ok", data: data });
 		});
 	} catch (error) {
 		return res.send({ error: error });
