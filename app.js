@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 require("dotenv").config();
 
@@ -29,21 +30,31 @@ app.post("/auth/login", async (req, res) => {
 
 	const userExist = await user.findOne({
 		username: username,
-		password: password,
 	});
 
-	if (
-		userExist &&
-		username === userExist.username &&
-		password === userExist.password
-	) {
-		res.send({ status: "ok", data: "Login successful" });
-	} else {
-		res.send({ status: "error", data: "Invalid username or password" });
+	if (!userExist) {
+		return res.send({
+			data: "User doesn't exist! Please ask the developer",
+		});
 	}
 
+	if (await bcrypt.compare(password, userExist.password)) {
+		res.send({ status: "ok", data: "Login successful" });
+		console.log("success");
+	} else {
+		res.send({ status: "error", data: "Invalid username or password" });
+		console.log("error");
+	}
+
+	// const encryptedPassword = await bcrypt.hash(password, 10);
 	// try {
-	// 	await user.create({ username: username, password: password });
+	// 	await user.create({
+	// 		username: username,
+	// 		password: encryptedPassword,
+	// 		firstName: firstName,
+	// 		lastName: lastName,
+	// 		address: address,
+	// 	});
 	// 	res.send({ status: "ok", data: "User created" });
 	// } catch (error) {
 	// 	res.send({ status: "error", data: error });
@@ -51,5 +62,5 @@ app.post("/auth/login", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log("Server is running on port 3000");
+	console.log(`Server is running on port ${PORT} `);
 });
