@@ -75,7 +75,15 @@ app.post("/userdata", async (req, res) => {
 		const userName = User.username;
 		user.findOne({ email: userName }).then((data) => {
 			console.log("verify");
-			return res.send({ status: "Ok", data: data });
+			return res.send({
+				status: "Ok",
+				data: {
+					username: userName,
+					firstName: User.firstName,
+					lastName: User.lastName,
+					address: User.address,
+				},
+			});
 		});
 	} catch (error) {
 		return res.send({ error: error });
