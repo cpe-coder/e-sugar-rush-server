@@ -2,11 +2,15 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 require("dotenv").config();
 
 const mongoUrl = process.env.MONGODB_URI;
 const PORT = 8000;
+
+const JWTSECRET =
+	"gjjk6vyl0twtosl6945gr0fz()709hgtq1fc98fmu725k[]{}4xvjkx7pecvtgr94fazvyt6yaj2ycxb2w6dazos0othe24cz9mp3oo7qrm8gf4js73x3dt064wzvjt6kz03b51pckkmiybh9wte4x0zvpkxbid00c58bci3re4al5j2pezpcej8o8btwe78hs6f4tubx264id";
 
 mongoose
 	.connect(mongoUrl)
@@ -39,8 +43,11 @@ app.post("/auth/login", async (req, res) => {
 	}
 
 	if (await bcrypt.compare(password, userExist.password)) {
-		res.send({ status: "ok", data: "Login successful" });
-		console.log("success");
+		const token = jwt.sign({ username: userExist.username }, JWTSECRET);
+
+		if (res.status(200)) {
+			return res.send({ status: "ok", data: "Login successful", token: token });
+		}
 	} else {
 		res.send({ status: "error", data: "Invalid username or password" });
 		console.log("error");
@@ -59,6 +66,21 @@ app.post("/auth/login", async (req, res) => {
 	// } catch (error) {
 	// 	res.send({ status: "error", data: error });
 	// }
+});
+
+app.post("/auth/verification", async (req, res) => {
+	const { token } = req.body;
+
+	try {
+		const user = jwt.verify(token, JWTSECRET);
+		const userUsername = user.username;
+
+		user.findOne({ username: userUsername }).then((data) => {
+			return res.send({ status: "ok", data: data });
+		});
+	} catch (error) {
+		return res.send({ error: error });
+	}
 });
 
 app.listen(PORT, () => {
