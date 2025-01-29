@@ -90,6 +90,36 @@ app.post("/userdata", async (req, res) => {
 	}
 });
 
+app.post("/update-user", async (req, res) => {
+	const { username, firstName, lastName, address } = req.body;
+	console.log(req.body);
+	try {
+		await user.updateOne(
+			{ username: username },
+			{
+				$set: {
+					usename,
+					firstName,
+					lastName,
+					address,
+				},
+			}
+		);
+		res.send({ status: "Ok", data: "Credentials Updated" });
+	} catch (error) {
+		return res.send({ error: error });
+	}
+});
+
+app.get("/get-all-user", async (req, res) => {
+	try {
+		const data = await user.find({});
+		res.send({ status: "Ok", data: data });
+	} catch (error) {
+		return res.send({ error: error });
+	}
+});
+
 app.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT} `);
 });
