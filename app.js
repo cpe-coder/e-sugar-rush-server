@@ -70,19 +70,16 @@ app.post("/auth/login", async (req, res) => {
 
 app.post("/userdata", async (req, res) => {
 	const { token } = req.body;
+
+	console.log(token);
 	try {
 		const User = jwt.verify(token, JWTSECRET);
 		const userName = User.username;
-		user.findOne({ email: userName }).then((data) => {
+		user.findOne({ username: userName }).then((data) => {
 			console.log("verify");
 			return res.send({
 				status: "Ok",
-				data: {
-					username: userName,
-					firstName: User.firstName,
-					lastName: User.lastName,
-					address: User.address,
-				},
+				data: data,
 			});
 		});
 	} catch (error) {
@@ -90,15 +87,14 @@ app.post("/userdata", async (req, res) => {
 	}
 });
 
-app.post("/update-user", async (req, res) => {
+app.post("/update", async (req, res) => {
 	const { username, firstName, lastName, address } = req.body;
-	console.log(req.body);
 	try {
 		await user.updateOne(
 			{ username: username },
 			{
 				$set: {
-					usename,
+					username,
 					firstName,
 					lastName,
 					address,
