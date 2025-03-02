@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { download } = require("express/lib/response");
 
 require("dotenv").config();
 
@@ -114,6 +115,11 @@ app.get("/get-all-user", async (req, res) => {
 	} catch (error) {
 		return res.send({ error: error });
 	}
+});
+
+app.get("/api/download", (req, res) => {
+	const filePath = "./e-sugar-rush.apk";
+	res.download(filePath);
 });
 
 app.listen(PORT, () => {
